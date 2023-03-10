@@ -103,7 +103,12 @@ class SubscriptionServiceTest {
         doReturn(Optional.of(subscription)).when(subscriptionDao).findById(subscription.getId());
         subscription.setStatus(Status.EXPIRED);
 
-        assertThrows(SubscriptionException.class, () -> subscriptionService.cancel(subscription.getId()));
+        assertThrows(SubscriptionException.class, () -> subscriptionService.expire(subscription.getId()));
+    }
+    @Test
+    void expireFailedIllegalException(){
+        Subscription subscription = getSubscription();
+        assertThrows(IllegalArgumentException.class, () -> subscriptionService.expire(subscription.getId()));
     }
     private static CreateSubscriptionDto getCreateSubscriptionDto() {
         return CreateSubscriptionDto.builder()
