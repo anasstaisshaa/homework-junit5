@@ -30,7 +30,8 @@ public class CreateSubscriptionValidator implements Validator<CreateSubscription
         if (Provider.findByNameOpt(object.getProvider()).isEmpty()) {
             validationResult.add(Error.of(102, "provider is invalid"));
         }
-        if (object.getExpirationDate() == null || object.getExpirationDate().isBefore(Instant.now())) {
+        if (object.getExpirationDate() == null ||
+                object.getExpirationDate().isBefore(Instant.now())) {
             validationResult.add(Error.of(103, "expirationDate is invalid"));
         }
         return validationResult;

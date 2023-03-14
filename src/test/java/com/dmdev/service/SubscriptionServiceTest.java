@@ -11,13 +11,10 @@ import com.dmdev.mapper.CreateSubscriptionMapper;
 import com.dmdev.validator.CreateSubscriptionValidator;
 import com.dmdev.validator.Error;
 import com.dmdev.validator.ValidationResult;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.exceptions.base.MockitoException;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.Clock;
@@ -43,20 +40,20 @@ class SubscriptionServiceTest {
     SubscriptionService subscriptionService;
 
     @Test
-    void upsert() {
-        CreateSubscriptionDto dto = getCreateSubscriptionDto();
-        Subscription subscription = getSubscription();
+    void testWhenCreateValidDto_ThenSubscriptionEqualToDto() {
+        CreateSubscriptionDto dto = buildCreateSubscriptionDto();
+        Subscription subscription = buildSubscription();
 
         doReturn(new ValidationResult()).when(createSubscriptionValidator).validate(dto);
         doReturn(List.of(subscription)).when(subscriptionDao).findByUserId(dto.getUserId());
-        doReturn(subscription).when(subscriptionDao).upsert(subscription);
+        doReturn(subscription).when(subscriptionDao).upsert(subscription); //TODO clarify how to use real class
 
         Subscription actualResult = subscriptionService.upsert(dto);
         assertThat(actualResult).isEqualTo(subscription);
     }
     @Test
-    void upsertFailed(){
-        CreateSubscriptionDto dto = getCreateSubscriptionDto();
+    void testWhenValidatorResultHasErrorAndCallingUpsert_ThenThrowValidationException(){
+        CreateSubscriptionDto dto = buildCreateSubscriptionDto();
 
         ValidationResult validationResult = new ValidationResult();
         validationResult.add(Error.of(1, "message"));
@@ -68,8 +65,8 @@ class SubscriptionServiceTest {
     }
 
     @Test
-    void cancel() {
-        Subscription subscription = getSubscription();
+    void cancel() { //TODO correct name
+        Subscription subscription = buildSubscription();
 
         doReturn(Optional.of(subscription)).when(subscriptionDao).findById(subscription.getId());
         subscriptionService.cancel(subscription.getId());
@@ -78,8 +75,8 @@ class SubscriptionServiceTest {
         assertThat(actualResult).isEqualTo(Status.CANCELED);
     }
     @Test
-    void cancelFailed(){
-        Subscription subscription = getSubscription();
+    void cancelFailed(){ //TODO correct name
+        Subscription subscription = buildSubscription();
         subscription.setStatus(Status.CANCELED);
 
         doReturn(Optional.of(subscription)).when(subscriptionDao).findById(subscription.getId());
@@ -88,8 +85,8 @@ class SubscriptionServiceTest {
     }
 
     @Test
-    void expire() {
-        Subscription subscription = getSubscription();
+    void expire() { //TODO correct name
+        Subscription subscription = buildSubscription();
 
         doReturn(Optional.of(subscription)).when(subscriptionDao).findById(subscription.getId());
         subscriptionService.expire(subscription.getId());
@@ -97,8 +94,8 @@ class SubscriptionServiceTest {
         assertThat(subscription.getStatus()).isEqualTo(Status.EXPIRED);
     }
     @Test
-    void expireFailed(){
-        Subscription subscription = getSubscription();
+    void expireFailed(){ //TODO correct name
+        Subscription subscription = buildSubscription();
 
         doReturn(Optional.of(subscription)).when(subscriptionDao).findById(subscription.getId());
         subscription.setStatus(Status.EXPIRED);
@@ -106,11 +103,11 @@ class SubscriptionServiceTest {
         assertThrows(SubscriptionException.class, () -> subscriptionService.expire(subscription.getId()));
     }
     @Test
-    void expireFailedIllegalException(){
-        Subscription subscription = getSubscription();
+    void testIfObjectIsNotFound_ThenThrowIllegalArgumentException(){
+        Subscription subscription = buildSubscription();
         assertThrows(IllegalArgumentException.class, () -> subscriptionService.expire(subscription.getId()));
     }
-    private static CreateSubscriptionDto getCreateSubscriptionDto() {
+    private static CreateSubscriptionDto buildCreateSubscriptionDto() {
         return CreateSubscriptionDto.builder()
                 .userId(1)
                 .name("Ivan")
@@ -118,7 +115,7 @@ class SubscriptionServiceTest {
                 .expirationDate(Instant.MAX)
                 .build();
     }
-    private static Subscription getSubscription() {
+    private static Subscription buildSubscription() {
         return Subscription.builder()
                 .id(1)
                 .userId(1)

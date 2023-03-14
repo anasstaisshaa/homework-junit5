@@ -13,7 +13,7 @@ class CreateSubscriptionValidatorTest {
     private final CreateSubscriptionValidator validator = CreateSubscriptionValidator.getInstance();
 
     @Test
-    void validateSuccess() {
+    void testWhenValidDto_ThenValidatorReturnNoErrors() {
         CreateSubscriptionDto dto = CreateSubscriptionDto.builder()
                 .userId(1)
                 .name("Ivan")
@@ -24,7 +24,7 @@ class CreateSubscriptionValidatorTest {
         assertFalse(actualResult.hasErrors());
     }
     @Test
-    void invalidUserId(){
+    void testWhenUserIdIsNull_ThenValidatorReturnsErrorCode100(){
         CreateSubscriptionDto dto = CreateSubscriptionDto.builder()
                 .userId(null)
                 .name("Ivan")
@@ -37,7 +37,7 @@ class CreateSubscriptionValidatorTest {
         assertThat(actualResult.getErrors().get(0).getMessage()).isEqualTo("userId is invalid");
     }
     @Test
-    void invalidName(){
+    void testWhenNameIsNull_ThenValidatorReturnsErrorCode101(){
         CreateSubscriptionDto dto = CreateSubscriptionDto.builder()
                 .userId(1)
                 .name(null)
@@ -50,7 +50,7 @@ class CreateSubscriptionValidatorTest {
         assertThat(actualResult.getErrors().get(0).getMessage()).isEqualTo("name is invalid");
     }
     @Test
-    void invalidProvider(){
+    void testWhenProviderIsNull_ThenValidatorReturnsErrorCode102(){
         CreateSubscriptionDto dto = CreateSubscriptionDto.builder()
                 .userId(1)
                 .name("Ivan")
@@ -63,7 +63,7 @@ class CreateSubscriptionValidatorTest {
         assertThat(actualResult.getErrors().get(0).getMessage()).isEqualTo("provider is invalid");
     }
     @Test
-    void invalidDate(){
+    void testWhenDateIsMin_ThenValidatorReturnsErrorCode103(){
         CreateSubscriptionDto dto = CreateSubscriptionDto.builder()
                 .userId(1)
                 .name("Ivan")
